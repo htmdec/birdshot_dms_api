@@ -1,0 +1,100 @@
+{
+  "@context": [
+    "https://w3id.org/bundle/context",
+    {
+      "schema": "http://schema.org/"
+    },
+    {
+      "datacite": "https://schema.datacite.org/meta/kernel-4.3/#"
+    },
+    {
+      "wt": "https://vocabularies.wholetale.org/wt/1.1/"
+    },
+    {
+      "@base": "arcp://uid,663131d74119aad7c4657586/data/"
+    }
+  ],
+  "@id": "https://data.wholetale.org/api/v1/tale/663131d74119aad7c4657586",
+  "@type": "wt:Tale",
+  "aggregates": [
+    {
+      "uri": "./workspace/postBuild"
+    },
+    {
+      "uri": "./workspace/03 Profiling.ipynb"
+    },
+    {
+      "uri": "./workspace/requirements.txt"
+    },
+    {
+      "uri": "./workspace/01_DMS_API_Example.ipynb"
+    },
+    {
+      "uri": "./workspace/birdshot.py"
+    },
+    {
+      "uri": "./workspace/02_Campaign_Analysis.ipynb"
+    },
+    {
+      "schema:license": "CC-BY-4.0",
+      "uri": "./LICENSE"
+    }
+  ],
+  "createdBy": {
+    "@id": "mailto:willis8@illinois.edu",
+    "@type": "schema:Person",
+    "schema:email": "willis8@illinois.edu",
+    "schema:familyName": "Willis",
+    "schema:givenName": "Craig"
+  },
+  "createdOn": "2024-04-30 18:00:55.233000",
+  "datacite:relatedIdentifiers": [],
+  "dct:hasVersion": {
+    "@id": "https://data.wholetale.org/api/v1/tale/663131d74119aad7c4657586",
+    "@type": "wt:TaleVersion",
+    "schema:creator": {
+      "@id": "mailto:willis8@illinois.edu",
+      "@type": "schema:Person",
+      "schema:email": "willis8@illinois.edu",
+      "schema:familyName": "Willis",
+      "schema:givenName": "Craig"
+    },
+    "schema:dateCreated": "2024-04-30T18:00:55.233000+00:00",
+    "schema:dateModified": "2024-09-09T16:21:31.940000+00:00",
+    "schema:name": "BIRDSHOT HTMDEC DMS API Example"
+  },
+  "schema:author": [
+    {
+      "@id": "https://orcid.org/0000-0002-6148-7196",
+      "@type": "schema:Person",
+      "schema:familyName": "Willis",
+      "schema:givenName": "Craig"
+    },
+    {
+      "@id": "https://orcid.org/0000-0000-0000-0000",
+      "@type": "schema:Person",
+      "schema:familyName": "Kowalik",
+      "schema:givenName": "Kacper"
+    }
+  ],
+  "schema:description": "Example demonstrating how to use the HTMDEC DMS API to analyze BIRDSHOT campaign data.",
+  "schema:hasPart": [
+    {
+      "@id": "https://github.com/whole-tale/repo2docker_wholetale",
+      "@type": "schema:SoftwareApplication",
+      "schema:softwareVersion": "wholetale/repo2docker_wholetale:latest"
+    },
+    {
+      "@id": "images.htmdec.org/tale/ffdcbf5865f5b4591a4504a8180e46af:fc1aa4faa34ba7ffa20b0dd7e386008d",
+      "@type": "schema:SoftwareApplication",
+      "schema:applicationCategory": "DockerImage"
+    }
+  ],
+  "schema:image": "https://data.htmdec.org/api/v1/file/66338ed04119aad7c4658006/download?contentDisposition=inline",
+  "schema:keywords": "Example",
+  "schema:name": "BIRDSHOT HTMDEC DMS API Example",
+  "schema:schemaVersion": 9,
+  "wt:hasRecordedRuns": [],
+  "wt:identifier": "663131d74119aad7c4657586",
+  "wt:usesDataset": []
+}
