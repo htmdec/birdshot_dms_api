@@ -1,0 +1,17 @@
+,Target Composition (%).Al,Target Composition (%).Co,Target Composition (%).Cr,Target Composition (%).Cu,Target Composition (%).Fe,Target Composition (%).Mn,Target Composition (%).Ni,Target Composition (%).V,XRD.Phase,XRD.Lattice Parameters,Measured Composition (%).Al,Measured Composition (%).Co,Measured Composition (%).Cr,Measured Composition (%).Cu,Measured Composition (%).Fe,Measured Composition (%).Mn,Measured Composition (%).Ni,Measured Composition (%).V
+AAC01_VAM-A,0,15,25,0,5,0,50,5,FCC,3.574,0.0,15.1,25.2,0.0,5.1,0.0,49.6,5.1
+AAC02_VAM-A,0,10,5,0,35,0,35,15,FCC,3.600,0.0,10.0,5.0,0.0,35.1,0.0,34.8,15.0
+AAC03_VAM-A,0,40,20,0,5,0,30,5,FCC,3.564,0.0,40.1,20.2,0.0,5.1,0.0,29.5,5.1
+AAC04_VAM-A,0,45,15,0,10,0,15,15,FCC,3.580,0.0,44.8,15.1,0.0,10.1,0.0,14.8,15.1
+AAC05_VAM-A,0,75,0,0,15,0,0,10,FCC,3.573,0.0,74.4,0.0,0.0,15.4,0.0,0.0,10.2
+AAC06_VAM-A,0,25,20,0,10,0,35,10,FCC,3.580,0.0,24.9,20.3,0.0,10.1,0.0,34.4,10.2
+AAC07_VAM-A,0,45,5,0,15,0,25,10,FCC,3.573,0.0,45.0,5.1,0.0,15.2,0.0,24.7,9.9
+AAC08_VAM-A,0,30,10,0,15,0,30,15,FCC,3.581,0.0,29.8,10.1,0.0,15.2,0.0,29.6,15.2
+AAC09_VAM-A,5,10,5,0,20,0,55,5,FCC,3.575,5.2,10.0,5.1,0.0,20.3,0.0,54.2,5.1
+AAC10_VAM-A,0,10,20,0,5,0,60,5,FCC,3.560,0.0,10.3,20.4,0.0,5.1,0.0,59.2,5.1
+AAC11_VAM-A,0,10,5,0,5,0,50,30,FCC,3.603,0.0,10.0,5.0,0.0,5.0,0.0,49.5,30.5
+AAC12_VAM-A,0,35,15,0,5,0,20,25,FCC,3.599,,,,,,,,
+AAC13_VAM-A,0,15,20,0,5,0,45,15,FCC,3.591,0.0,15.1,20.2,0.0,5.1,0.0,44.4,15.3
+AAC14_VAM-A,0,15,5,0,15,0,40,25,FCC,3.597,,,,,,,,
+AAC15_VAM-A,5,5,5,0,20,0,50,15,FCC,3.586,,,,,,,,
+AAC16_VAM-A,0,25,15,0,5,0,35,20,FCC,3.596,,,,,,,,

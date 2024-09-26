@@ -1,0 +1,7 @@
+periodictable
+pandas
+girder-client
+dash-bootstrap-components
+plotly
+dash
+ydata-profiling==4.5

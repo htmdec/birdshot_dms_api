@@ -1,0 +1,37 @@
+,AAA,AAB,AAC,AAD,AAE,BAA,BBA,BBB,BBC
+Elastic Modulus.a,0.0,0.0,16.0,16.0,16.0,0,1,7,16.0
+Elastic Modulus.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+Elastic Modulus.c,16.0,16.0,16.0,16.0,16.0,15,14,11,16.0
+Elongation.a,0.0,0.0,16.0,16.0,16.0,0,1,7,16.0
+Elongation.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+Elongation.c,16.0,16.0,16.0,16.0,16.0,15,14,11,16.0
+Maximum ∂2σ/∂ε2.a,0.0,0.0,16.0,16.0,16.0,0,1,9,16.0
+Maximum ∂2σ/∂ε2.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+Maximum ∂2σ/∂ε2.c,16.0,16.0,16.0,16.0,16.0,16,14,11,16.0
+Measured Composition (%).Al,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Co,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Cr,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Cu,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Fe,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Mn,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).Ni,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Measured Composition (%).V,0.0,0.0,4.0,2.0,1.0,0,1,6,16.0
+Target Composition (%).Al,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Co,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Cr,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Cu,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Fe,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Mn,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).Ni,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+Target Composition (%).V,0.0,0.0,0.0,0.0,0.0,0,0,0,16.0
+UTS/YS Ratio.a,0.0,0.0,16.0,16.0,16.0,0,1,7,16.0
+UTS/YS Ratio.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+UTS/YS Ratio.c,16.0,16.0,16.0,16.0,16.0,15,14,11,16.0
+Ultimate Tensile Strength.a,0.0,0.0,16.0,16.0,16.0,0,1,7,16.0
+Ultimate Tensile Strength.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+Ultimate Tensile Strength.c,16.0,16.0,16.0,16.0,16.0,15,14,11,16.0
+XRD.Lattice Parameters,0.0,0.0,0.0,0.0,0.0,0,1,6,16.0
+XRD.Phase,0.0,0.0,0.0,0.0,0.0,0,1,6,16.0
+Yield Strength.a,0.0,0.0,16.0,16.0,16.0,0,1,7,16.0
+Yield Strength.b,0.0,0.0,16.0,16.0,16.0,0,3,6,16.0
+Yield Strength.c,16.0,16.0,16.0,16.0,16.0,15,14,11,16.0
