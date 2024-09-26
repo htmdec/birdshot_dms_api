@@ -36,7 +36,6 @@ def query(campaign):
     for entry in raw_data:
         entry = entry['data']
         sample_id = entry['sampleId'].split('_')
-        # logging.debug(sample_id)
         if len(sample_id) > 2:
             subsample_id = sample_id[-1]
         else:
@@ -88,13 +87,15 @@ def query(campaign):
     else:
         df = df.astype(types)
         
-    # logging.debug("Done.")
     return df
 
 
 
 @callback(
     [Output('indicator-graphic', 'figure'),
+     Output('missing-indices', 'children'),
+     Output('num-points', 'children'),
+     Output('size-column', 'options'),
      Output('error-message', 'children')],
     [Input('campaign-column', 'value'),
      Input('xaxis-column', 'value'),
@@ -113,7 +114,7 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if df.empty:
-            return go.Figure(), 'Data cannot be found. The graph cannot be generated.'
+            return go.Figure(), 'N/A', 'N/A', '', 'Data cannot be found. The graph cannot be generated.'
         elif missing_columns:
             fig = go.Figure()
             fig.update_layout(
@@ -132,7 +133,17 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                 xaxis_title=xaxis_column_name,
                 yaxis_title=yaxis_column_name
             )
-            return fig, f'The following columns are missing: {", ".join(missing_columns)}'
+            return fig, 'N/A', 'N/A', '', f'The following columns are missing: {", ".join(missing_columns)}'
+        
+        # Create a copy of df to filter out rows where X, Y, color, or size columns are missing
+        filtered_df = df[[xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]].copy().dropna()
+
+        # Count the number of points to be plotted
+        num_points = len(filtered_df)
+
+        # Get indices of rows where X or Y are missing (without altering df)
+        missing_indices = df.index[df[[xaxis_column_name, yaxis_column_name]].isna().any(axis=1)].tolist()
+        missing_indices = ', '.join(map(str, missing_indices)) + ','
 
         fig = px.scatter(df, x=xaxis_column_name,
                          y=yaxis_column_name,
@@ -142,22 +153,30 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                                 'sample': df.index   # Example: Add Material Name to hover
                             }
                         )
-        return fig, ''
+    
+        _,_,_, numeric_cols_without_nan = return_filtered_df(df)
+        return fig, missing_indices, num_points, numeric_cols_without_nan, 'No Error'
 
     except Exception as e:
-        print(df)
-        print(df.isna().sum())
-        return go.Figure(), f'An error occurred: {str(e)}'
+        return go.Figure(), 'N/A', 'N/A', '', f'An error occurred: {str(e)}'
 
+def return_filtered_df(df):
+    numeric_df = df.select_dtypes(include=[int, float])
+    cols = sorted(df.columns)
+    numeric_cols = sorted(numeric_df)
+    numeric_cols_without_nan = numeric_df.columns[numeric_df.notna().all()].tolist()
+    return cols, numeric_cols, numeric_df, numeric_cols_without_nan
+    
+    
 def serve_layout():
     default_campaign = 'BAA'    
     df = query(default_campaign)
     
-    numeric_df = df.select_dtypes(include=[int, float])
-    cols = sorted(df.columns)
-    numeric_cols = sorted(numeric_df)
+    cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
     logging.debug(cols)
-    
+    logging.debug(numeric_cols)
+    logging.debug(numeric_cols_without_nan)
+
     return html.Div([
         html.Div([
             html.Label(  
@@ -212,7 +231,7 @@ def serve_layout():
                     style={'font-weight': 'bold', 'text-align': 'right','offset':1}
                 ),              
                 dcc.Dropdown(
-                    numeric_cols,
+                    numeric_cols_without_nan,
                     'Target Composition (%).Co',
                     id='size-column',
                     style={ 'width': '80%'}
@@ -222,6 +241,14 @@ def serve_layout():
         ]),
 
         dcc.Graph(id='indicator-graphic'),
+        html.Div([
+            html.Label('Number of points plotted:'),
+            html.Div(id='num-points')
+        ]),
+        html.Div([
+            html.Label('Missing data indices:'),
+            html.Div(id='missing-indices')
+        ]),
         html.Div(id='error-message')
     ], style={'margin': '20px'})
 
