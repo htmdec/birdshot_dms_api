@@ -191,18 +191,30 @@ def serve_layout():
 
 
 def show_plot():
-    app = Dash(
-        __name__,
-        external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
-        requests_pathname_prefix="/proxy/8050/",
-    )
+    from dash import Dash
+    import dash_bootstrap_components as dbc
 
-    app.layout = serve_layout
+    port = 8050
+    while True:
+        try:
+            app = Dash(
+                __name__,
+                external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+                requests_pathname_prefix=f"/proxy/{port}/",
+            )
+            app.layout = serve_layout
+            app.run(
+                debug=False,
+                jupyter_mode="external",  # This avoids jupyter proxy complications
+                host="0.0.0.0",
+                port=port,
+                jupyter_server_url=f"http://{os.environ.get('TMP_URL', 'localhost:8888')}/",
+            )
+            break
+        except OSError as e:
+            if "Address" in str(e) and "already in use" in str(e):
+                port += 1  # Try next port
+            else:
+                raise
 
-    app.run(
-        debug=False,
-        jupyter_mode="jupyterlab",
-        host="0.0.0.0",
-        jupyter_server_url=f"https://{os.environ['TMP_URL']}/",
-    )
     return app
