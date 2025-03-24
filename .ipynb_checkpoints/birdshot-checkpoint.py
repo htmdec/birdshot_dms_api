@@ -22,8 +22,7 @@ def percent_composition(composition, total):
 @lru_cache
 def query(campaign, raw=False):
     client = GirderClient(apiUrl=os.environ["GIRDER_API_URL"])
-    client.authenticate(apiKey=os.environ["GIRDER_API_KEY"])
-
+    client.token = os.environ["GIRDER_TOKEN"]
     raw_data = client.get(
         "entry/search", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
     )
@@ -188,3 +187,33 @@ def serve_layout():
         ],
         style={"margin": "20px"},
     )
+
+
+def show_plot():
+    from dash import Dash
+    import dash_bootstrap_components as dbc
+
+    port = 8050
+    while True:
+        try:
+            app = Dash(
+                __name__,
+                external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+                requests_pathname_prefix=f"/proxy/{port}/",
+            )
+            app.layout = serve_layout
+            app.run(
+                debug=False,
+                jupyter_mode="external",  # This avoids jupyter proxy complications
+                host="0.0.0.0",
+                port=port,
+                jupyter_server_url=f"http://{os.environ.get('TMP_URL', 'localhost:8888')}/",
+            )
+            break
+        except OSError as e:
+            if "Address" in str(e) and "already in use" in str(e):
+                port += 1  # Try next port
+            else:
+                raise
+
+    return app
