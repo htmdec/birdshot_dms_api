@@ -188,3 +188,21 @@ def serve_layout():
         ],
         style={"margin": "20px"},
     )
+
+
+def show_plot():
+    app = Dash(
+        __name__,
+        external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+        requests_pathname_prefix="/proxy/8050/",
+    )
+
+    app.layout = serve_layout
+
+    app.run(
+        debug=False,
+        jupyter_mode="jupyterlab",
+        host="0.0.0.0",
+        jupyter_server_url=f"https://{os.environ['TMP_URL']}/",
+    )
+    return app
