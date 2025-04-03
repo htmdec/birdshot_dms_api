@@ -1,11 +1,13 @@
 from functools import lru_cache
 from girder_client import GirderClient
 import pandas as pd
-from dash import Dash, html, dcc, Output, Input
+from dash import Dash, html, dcc, Output, Input, ctx
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import os
 from periodictable import Al, V, Cr, Mn, Fe, Co, Ni, Cu
+
+# ========= Utility Functions =========
 
 
 def total_molar_mass(composition):
@@ -15,15 +17,10 @@ def total_molar_mass(composition):
     return molar_mass
 
 
-@lru_cache
-def query(campaign, client, raw=False):
-    raw_data = client.get(
-        "entry/search", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
-    )
-    if raw:
-        return raw_data
-    # You can convert to DataFrame or further process here
+# ========= Query Function =========
 
+
+def query(campaign, client, raw=False):
     raw_data = client.get(
         "entry/search", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
     )
@@ -74,6 +71,9 @@ def query(campaign, client, raw=False):
                 continue
 
     return pd.DataFrame.from_dict(data, orient="index")
+
+
+# ========= Plot Server =========
 
 
 def serve_layout():
@@ -135,45 +135,49 @@ def serve_layout():
     )
 
 
-app = Dash(
-    __name__, external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME]
-)
-app.layout = serve_layout
+# ========= Main Launch Function =========
 
 
-@app.callback(
-    Output("xaxis-column", "options"),
-    Output("yaxis-column", "options"),
-    Output("color-column", "options"),
-    Output("size-column", "options"),
-    Output("xaxis-column", "value"),
-    Output("yaxis-column", "value"),
-    Output("color-column", "value"),
-    Output("size-column", "value"),
-    Input("campaign-column", "value"),
-)
-def update_dropdown_columns(campaign):
-    df = query(campaign)
-    cols = sorted(df.columns)
-    defaults = [cols[i] if len(cols) > i else cols[0] for i in range(4)]
-    return cols, cols, cols, cols, *defaults
+def show_plot(client):
+    app = Dash(
+        __name__,
+        external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+    )
+    app.layout = serve_layout
 
+    # --- Callbacks using client ---
 
-@app.callback(
-    Output("indicator-graphic", "figure"),
-    Input("campaign-column", "value"),
-    Input("xaxis-column", "value"),
-    Input("yaxis-column", "value"),
-    Input("color-column", "value"),
-    Input("size-column", "value"),
-)
-def update_graph(campaign, x_col, y_col, color_col, size_col):
-    df = query(campaign)
-    fig = px.scatter(df, x=x_col, y=y_col, color=color_col, size=size_col)
-    return fig
+    @app.callback(
+        Output("xaxis-column", "options"),
+        Output("yaxis-column", "options"),
+        Output("color-column", "options"),
+        Output("size-column", "options"),
+        Output("xaxis-column", "value"),
+        Output("yaxis-column", "value"),
+        Output("color-column", "value"),
+        Output("size-column", "value"),
+        Input("campaign-column", "value"),
+    )
+    def update_dropdown_columns(campaign):
+        df = query(campaign, client)
+        cols = sorted(df.columns)
+        defaults = [cols[i] if len(cols) > i else cols[0] for i in range(4)]
+        return cols, cols, cols, cols, *defaults
 
+    @app.callback(
+        Output("indicator-graphic", "figure"),
+        Input("campaign-column", "value"),
+        Input("xaxis-column", "value"),
+        Input("yaxis-column", "value"),
+        Input("color-column", "value"),
+        Input("size-column", "value"),
+    )
+    def update_graph(campaign, x_col, y_col, color_col, size_col):
+        df = query(campaign, client)
+        fig = px.scatter(df, x=x_col, y=y_col, color=color_col, size=size_col)
+        return fig
 
-def show_plot():
+    # --- Run server ---
     port = 8050
     while True:
         try:
