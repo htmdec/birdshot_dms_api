@@ -1,14 +1,16 @@
 from functools import lru_cache
 from girder_client import GirderClient
 import pandas as pd
-from dash import Dash, html, dcc, Output, Input, ctx
+from dash import Dash, html, dcc, callback, Output, Input
 import plotly.express as px
 import dash_bootstrap_components as dbc
 import os
 from periodictable import Al, V, Cr, Mn, Fe, Co, Ni, Cu
-
+import logging
+import plotly.graph_objects as go
 # ========= Utility Functions =========
 
+query_terms = ["AAA", "AAB", "AAC", "AAD", "AAE", "BAA", "BBA", "BBB", "BBC", "CBA"]
 
 def total_molar_mass(composition):
     molar_mass = 0
@@ -22,9 +24,8 @@ def total_molar_mass(composition):
 
 def query(campaign, client, raw=False):
     raw_data = client.get(
-        "entry/search", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
+        "entry", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
     )
-
     if raw:
         return raw_data
 
@@ -57,7 +58,7 @@ def query(campaign, client, raw=False):
                 }
             )
         elif entry["suffix"] == "EDS":
-            for element, value in entry["Results"]["Measured Composition (%)"].items():
+            for element, value in entry["results"]["eds"].items():
                 data[sample_id][f"Measured Composition (%).{element}"] = value
         elif entry["suffix"] == "XRD":
             try:
@@ -69,119 +70,210 @@ def query(campaign, client, raw=False):
                 data[sample_id]["XRD.Lattice Parameters"] = phase["a"]
             except Exception:
                 continue
+    
+    types = {
+        'UTS/YS Ratio.a': float,
+        'UTS/YS Ratio.b': float
+    }
 
-    return pd.DataFrame.from_dict(data, orient="index")
+    # Create DataFrame from the data
+    df = pd.DataFrame.from_dict(data, orient='index')
+
+    # Check that all required columns are present in the DataFrame
+    missing_columns = [col for col in types if col not in df.columns]
+
+    if missing_columns:
+        logging.debug(f"Warning: Missing columns: {', '.join(missing_columns)}")
+        return df
+    else:
+        df = df.astype(types)
+
+    return df
 
 
 # ========= Plot Server =========
 
+def return_filtered_df(df):
+    numeric_df = df.select_dtypes(include=[int, float])
+    cols = sorted(df.columns)
+    numeric_cols = sorted(numeric_df)
+    numeric_cols_without_nan = numeric_df.columns[numeric_df.notna().all()].tolist()
+    return cols, numeric_cols, numeric_df, numeric_cols_without_nan
 
-def serve_layout():
-    return html.Div(
-        [
-            html.Div(
-                [
-                    html.Label("Campaign", style={"font-weight": "bold"}),
-                    dcc.Dropdown(
-                        [
-                            "AAA",
-                            "AAB",
-                            "AAC",
-                            "AAD",
-                            "AAE",
-                            "BAA",
-                            "BBA",
-                            "BBB",
-                            "BZZ",
-                            "CBA",
-                            "ZZZ",
-                        ],
-                        "AAA",
-                        id="campaign-column",
-                        style={"width": "150px"},
-                    ),
+def serve_layout(client):
+    default_campaign = 'CBA'    
+    df = query(default_campaign, client)
+    print(df)
+
+    cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
+    print(cols)
+    print(numeric_cols)
+
+    return html.Div([
+        html.Div([
+            html.Label(  
+                'Campaign', 
+                style={'font-weight': 'bold', 'text-align': 'right', 'offset':1}
+            ),
+            dcc.Dropdown(
+                query_terms,
+                default_campaign,
+                id='campaign-column',
+                style={ 'width': '100px'}
+            ), 
+            ], 
+            style={'margin-bottom': '10px'
+        }),
+        html.Div([                 
+            html.Div([         
+                html.Label(  
+                    'X-Axis', 
+                    style={'font-weight': 'bold', 'text-align': 'right','offset':1}
+                ),
+                dcc.Dropdown(
+                    numeric_cols,
+                    'Yield Strength.a',
+                    id='xaxis-column',
+                    style={ 'width': '80%', 'margin-bottom': '10px'}
+                ),
+                html.Label(  
+                    'Color', 
+                    style={'font-weight': 'bold', 'text-align': 'right','offset':1}
+                ),             
+                dcc.Dropdown(
+                    cols,
+                    'Target Composition (%).Fe',
+                    id='color-column',
+                    style={ 'width': '80%'}
+                ),
+
+            ], 
+            style={'width': '48%', 'display': 'inline-block'
+        }),
+        html.Div([
+            html.Label(  
+                'Y-Axis', 
+                style={'font-weight': 'bold', 'text-align': 'right','offset':1}
+            ),            
+            dcc.Dropdown(
+                numeric_cols,
+                'Ultimate Tensile Strength.a',
+                id='yaxis-column',
+                style={ 'width': '80%', 'margin-bottom': '10px'}
+            ),
+            html.Label(  
+                'Size', 
+                style={'font-weight': 'bold', 'text-align': 'right','offset':1}
+            ),              
+            dcc.Dropdown(
+                numeric_cols_without_nan,
+                'Target Composition (%).Co',
+                id='size-column',
+                style={ 'width': '80%'}
+            )
+            ], 
+            style={'width': '48%', 'float': 'right', 'display': 'inline-block'
+        }),     
+        ]),
+        dcc.Graph(id='indicator-graphic'),
+        html.Div([
+            html.Label('Number of points plotted:'),
+            html.Div(id='num-points')
+        ]),
+        html.Div([
+            html.Label('Missing data indices:'),
+            html.Div(id='missing-indices')
+        ]),
+        html.Div(id='error-message')
+        ], 
+        style={'margin': '20px'
+    })
+
+@callback(
+    [Output('indicator-graphic', 'figure'),
+     Output('missing-indices', 'children'),
+     Output('num-points', 'children'),
+     Output('size-column', 'options'),
+     Output('error-message', 'children')],
+    [Input('campaign-column', 'value'),
+     Input('xaxis-column', 'value'),
+     Input('yaxis-column', 'value'),
+     Input('color-column', 'value'),
+     Input('size-column', 'value')]
+)
+def update_graph(campaign, xaxis_column_name, yaxis_column_name,
+                color_column_name, size_column_name):    
+
+    try:
+        df = query(campaign, client)
+        print(df)
+        
+        # Check if all required columns are in the dataframe
+        required_columns = [xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]
+        missing_columns = [col for col in required_columns if col not in df.columns]
+
+        if df.empty:
+            return go.Figure(), 'N/A', 'N/A', '', 'Data cannot be found. The graph cannot be generated.'
+        elif missing_columns:
+            fig = go.Figure()
+            fig.update_layout(
+                title='Missing Columns',
+                annotations=[
+                    dict(
+                        text=f'Error: Missing columns: {", ".join(missing_columns)}',
+                        x=0.5,
+                        y=0.5,
+                        font_size=20,
+                        showarrow=False,
+                        xref='paper',
+                        yref='paper'
+                    )
                 ],
-                style={"margin-bottom": "10px"},
-            ),
-            html.Div(
-                [
-                    html.Div(
-                        [
-                            html.Label("X-Axis", style={"font-weight": "bold"}),
-                            dcc.Dropdown(id="xaxis-column"),
-                            html.Label("Color", style={"font-weight": "bold"}),
-                            dcc.Dropdown(id="color-column"),
-                        ],
-                        style={"width": "48%", "display": "inline-block"},
-                    ),
-                    html.Div(
-                        [
-                            html.Label("Y-Axis", style={"font-weight": "bold"}),
-                            dcc.Dropdown(id="yaxis-column"),
-                            html.Label("Size", style={"font-weight": "bold"}),
-                            dcc.Dropdown(id="size-column"),
-                        ],
-                        style={
-                            "width": "48%",
-                            "float": "right",
-                            "display": "inline-block",
-                        },
-                    ),
-                ]
-            ),
-            dcc.Graph(id="indicator-graphic"),
-        ],
-        style={"margin": "20px"},
-    )
+                xaxis_title=xaxis_column_name,
+                yaxis_title=yaxis_column_name
+            )
+            return fig, 'N/A', 'N/A', '', f'The following columns are missing: {", ".join(missing_columns)}'
+        
+        # Create a copy of df to filter out rows where X, Y, color, or size columns are missing
+        filtered_df = df[[xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]].copy().dropna()
 
+        # Count the number of points to be plotted
+        num_points = len(filtered_df)
+
+        # Get indices of rows where X or Y are missing (without altering df)
+        missing_indices = df.index[df[[xaxis_column_name, yaxis_column_name]].isna().any(axis=1)].tolist()
+        missing_indices = ', '.join(map(str, missing_indices)) + ','
+
+        fig = px.scatter(df, x=xaxis_column_name,
+                        y=yaxis_column_name,
+                        size=size_column_name,
+                        color=color_column_name,
+                        hover_data={  # Here, you can add more columns from `df` for hover data
+                                'sample': df.index   # Example: Add Material Name to hover
+                            }
+                        )
+    
+        _,_,_, numeric_cols_without_nan = return_filtered_df(df)
+        return fig, missing_indices, num_points, numeric_cols_without_nan, 'No Error'
+
+    except Exception as e:
+        return go.Figure(), 'N/A', 'N/A', '', f'An error occurred: {str(e)}'
 
 # ========= Main Launch Function =========
-
-
-def show_plot(client):
+def show_plot(external_client):
+    global client  # 👈 Add this line
+    client = external_client
     app = Dash(
         __name__,
         external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
     )
-    app.layout = serve_layout
-
-    # --- Callbacks using client ---
-
-    @app.callback(
-        Output("xaxis-column", "options"),
-        Output("yaxis-column", "options"),
-        Output("color-column", "options"),
-        Output("size-column", "options"),
-        Output("xaxis-column", "value"),
-        Output("yaxis-column", "value"),
-        Output("color-column", "value"),
-        Output("size-column", "value"),
-        Input("campaign-column", "value"),
-    )
-    def update_dropdown_columns(campaign):
-        df = query(campaign, client)
-        cols = sorted(df.columns)
-        defaults = [cols[i] if len(cols) > i else cols[0] for i in range(4)]
-        return cols, cols, cols, cols, *defaults
-
-    @app.callback(
-        Output("indicator-graphic", "figure"),
-        Input("campaign-column", "value"),
-        Input("xaxis-column", "value"),
-        Input("yaxis-column", "value"),
-        Input("color-column", "value"),
-        Input("size-column", "value"),
-    )
-    def update_graph(campaign, x_col, y_col, color_col, size_col):
-        df = query(campaign, client)
-        fig = px.scatter(df, x=x_col, y=y_col, color=color_col, size=size_col)
-        return fig
+    app.layout = serve_layout(client)
 
     # --- Run server ---
     port = 8050
     while True:
         try:
-            app.run(debug=False, host="localhost", port=port, use_reloader=False)
+            app.run(debug=False, host="localhost", port=port)
             break
         except OSError as e:
             if "already in use" in str(e):
