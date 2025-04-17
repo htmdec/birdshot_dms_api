@@ -103,11 +103,8 @@ def return_filtered_df(df):
 def serve_layout(client):
     default_campaign = 'CBA'    
     df = query(default_campaign, client)
-    print(df)
 
     cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
-    print(cols)
-    print(numeric_cols)
 
     return html.Div([
         html.Div([
@@ -176,6 +173,7 @@ def serve_layout(client):
         }),     
         ]),
         dcc.Graph(id='indicator-graphic'),
+        html.Div(id='error-message'),
         html.Div([
             html.Label('Number of points plotted:'),
             html.Div(id='num-points')
@@ -184,7 +182,6 @@ def serve_layout(client):
             html.Label('Missing data indices:'),
             html.Div(id='missing-indices')
         ]),
-        html.Div(id='error-message')
         ], 
         style={'margin': '20px'
     })
@@ -206,7 +203,6 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
 
     try:
         df = query(campaign, client)
-        print(df)
         
         # Check if all required columns are in the dataframe
         required_columns = [xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]
@@ -234,7 +230,7 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
             )
             return fig, 'N/A', 'N/A', '', f'The following columns are missing: {", ".join(missing_columns)}'
         
-        # Create a copy of df to filter out rows where X, Y, color, or size columns are missing
+        
         filtered_df = df[[xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]].copy().dropna()
 
         # Count the number of points to be plotted
@@ -248,8 +244,8 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                         y=yaxis_column_name,
                         size=size_column_name,
                         color=color_column_name,
-                        hover_data={  # Here, you can add more columns from `df` for hover data
-                                'sample': df.index   # Example: Add Material Name to hover
+                        hover_data={  #
+                                'sample': df.index   
                             }
                         )
     
@@ -257,11 +253,12 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
         return fig, missing_indices, num_points, numeric_cols_without_nan, 'No Error'
 
     except Exception as e:
+        print(df)
         return go.Figure(), 'N/A', 'N/A', '', f'An error occurred: {str(e)}'
 
 # ========= Main Launch Function =========
 def show_plot(external_client):
-    global client  # 👈 Add this line
+    global client 
     client = external_client
     app = Dash(
         __name__,
