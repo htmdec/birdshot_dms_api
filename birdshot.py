@@ -8,16 +8,17 @@ import os
 from periodictable import Al, V, Cr, Mn, Fe, Co, Ni, Cu
 import logging
 import plotly.graph_objects as go
-# ========= Utility Functions =========
+import re
 
 query_terms = ["AAA", "AAB", "AAC", "AAD", "AAE", "BAA", "BBA", "BBB", "BBC", "CBA"]
+
+# ========= Utility Functions =========
 
 def total_molar_mass(composition):
     molar_mass = 0
     for element, value in composition.items():
         molar_mass += value / getattr(globals()[element], "mass")
     return molar_mass
-
 
 # ========= Query Function =========
 
@@ -90,6 +91,27 @@ def query(campaign, client, raw=False):
 
     return df
 
+def average_replicate_columns(df):
+    # Define the measurement groups to average
+    measurements_to_average = [
+        'Elastic Modulus', 'Elongation', 'Maximum ∂2σ/∂ε2',
+        'UTS/YS Ratio', 'Ultimate Tensile Strength', 'Yield Strength'
+    ]
+
+    df_new = df.copy()
+
+    for measurement in measurements_to_average:
+        # Find columns matching this measurement with .b/.c/.d suffix
+        pattern = re.compile(rf'^{re.escape(measurement)}\.(b|c|d)$')
+        replicate_cols = [col for col in df.columns if pattern.match(col)]
+
+        if replicate_cols:
+            # Compute the row-wise average
+            df_new[f'{measurement} (Average)'] = df[replicate_cols].mean(axis=1)
+            # Drop the original replicate columns
+            df_new.drop(columns=replicate_cols, inplace=True)
+
+    return df_new
 
 # ========= Plot Server =========
 
@@ -102,7 +124,11 @@ def return_filtered_df(df):
 
 def serve_layout(client):
     default_campaign = 'CBA'    
+
     df = query(default_campaign, client)
+
+    if average:
+        df = average_replicate_columns(df)
 
     cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
 
@@ -190,8 +216,12 @@ def serve_layout(client):
     [Output('indicator-graphic', 'figure'),
      Output('missing-indices', 'children'),
      Output('num-points', 'children'),
-     Output('size-column', 'options'),
-     Output('error-message', 'children')],
+     Output('error-message', 'children'),
+     Output("xaxis-column", "options"),
+     Output("yaxis-column", "options"),
+     Output("color-column", "options"),
+     Output("size-column", "options"),
+     ],
     [Input('campaign-column', 'value'),
      Input('xaxis-column', 'value'),
      Input('yaxis-column', 'value'),
@@ -202,14 +232,25 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                 color_column_name, size_column_name):    
 
     try:
+        print(campaign)
         df = query(campaign, client)
+
+        print(df)
+        print(df.cols)
+
+        if average:
+            df = average_replicate_columns(df)
+
+        print(df)
+
+        cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
         
         # Check if all required columns are in the dataframe
         required_columns = [xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]
         missing_columns = [col for col in required_columns if col not in df.columns]
 
         if df.empty:
-            return go.Figure(), 'N/A', 'N/A', '', 'Data cannot be found. The graph cannot be generated.'
+            return go.Figure(), 'N/A', 'N/A', 'Data cannot be found. The graph cannot be generated.', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
         elif missing_columns:
             fig = go.Figure()
             fig.update_layout(
@@ -228,7 +269,7 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                 xaxis_title=xaxis_column_name,
                 yaxis_title=yaxis_column_name
             )
-            return fig, 'N/A', 'N/A', '', f'The following columns are missing: {", ".join(missing_columns)}'
+            return fig, 'N/A', 'N/A', f'The following columns are missing: {", ".join(missing_columns)}', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
         
         
         filtered_df = df[[xaxis_column_name, yaxis_column_name, color_column_name, size_column_name]].copy().dropna()
@@ -249,15 +290,17 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                             }
                         )
     
-        _,_,_, numeric_cols_without_nan = return_filtered_df(df)
-        return fig, missing_indices, num_points, numeric_cols_without_nan, 'No Error'
+        
+        return fig, missing_indices, num_points, 'No Error', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
 
     except Exception as e:
-        return go.Figure(), 'N/A', 'N/A', '', f'An error occurred: {str(e)}'
+        return go.Figure(), 'N/A', 'N/A', f'An error occurred: {str(e)}', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
 
 # ========= Main Launch Function =========
 def show_plot(external_client):
     global client 
+    global average
+    average = True
     client = external_client
     app = Dash(
         __name__,
