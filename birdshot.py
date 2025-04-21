@@ -102,7 +102,7 @@ def average_replicate_columns(df):
 
     for measurement in measurements_to_average:
         # Find columns matching this measurement with .b/.c/.d suffix
-        pattern = re.compile(rf'^{re.escape(measurement)}\.(b|c|d)$')
+        pattern = re.compile(rf'^{re.escape(measurement)}\.[a-zA-Z]$')
         replicate_cols = [col for col in df.columns if pattern.match(col)]
 
         if replicate_cols:
@@ -235,8 +235,8 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
         print(campaign)
         df = query(campaign, client)
 
-        print(df)
-        print(df.cols)
+        # print(df)
+        print(df.columns)
 
         if average:
             df = average_replicate_columns(df)
