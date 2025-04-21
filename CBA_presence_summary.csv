@@ -1,0 +1,26 @@
+Sample,Target Composition (%),Elastic Modulus,Elongation,Maximum ∂2σ/∂ε2,UTS/YS Ratio,Ultimate Tensile Strength,Yield Strength,Measured Composition (%),Target Composition (%).Co,Target Composition (%).Cr,Target Composition (%).Fe,Target Composition (%).Mn,Target Composition (%).Ni,Measured Composition (%).Al,Measured Composition (%).Co,Measured Composition (%).Cr,Measured Composition (%).Cu,Measured Composition (%).Fe,Measured Composition (%).Mn,Measured Composition (%).Ni,XRD.Phase,XRD.Lattice Parameters
+CBA01_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA02_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA03_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA04_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA05_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA06_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA07_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA08_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA09_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA10_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA11_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA12_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA13_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA14_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA15_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA16_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA17_VAM-A,V,None,None,None,None,None,None,V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,No,No
+CBA18_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA19_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA20_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA21_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA22_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA23_VAM-A,V,"b, c, d","b, c, d","b, c, d","b, c, d","b, c, d","b, c, d",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA24_VAM-A,V,"b, c","b, c","b, c","b, c","b, c","b, c",V,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes,Yes
+CBA,24/24,56/72,56/72,56/72,56/72,56/72,56/72,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,24/24,23/24,23/24

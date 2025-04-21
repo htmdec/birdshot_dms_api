@@ -9,6 +9,7 @@ from periodictable import Al, V, Cr, Mn, Fe, Co, Ni, Cu
 import logging
 import plotly.graph_objects as go
 import re
+import json
 
 query_terms = ["AAA", "AAB", "AAC", "AAD", "AAE", "BAA", "BBA", "BBB", "BBC", "CBA"]
 
@@ -21,7 +22,6 @@ def total_molar_mass(composition):
     return molar_mass
 
 # ========= Query Function =========
-
 
 def query(campaign, client, raw=False):
     raw_data = client.get(
@@ -88,11 +88,12 @@ def query(campaign, client, raw=False):
         return df
     else:
         df = df.astype(types)
+    # print(df)
 
     return df
 
 def average_replicate_columns(df):
-    # Define the measurement groups to average
+
     measurements_to_average = [
         'Elastic Modulus', 'Elongation', 'Maximum ∂2σ/∂ε2',
         'UTS/YS Ratio', 'Ultimate Tensile Strength', 'Yield Strength'
@@ -106,10 +107,11 @@ def average_replicate_columns(df):
         replicate_cols = [col for col in df.columns if pattern.match(col)]
 
         if replicate_cols:
-            # Compute the row-wise average
             df_new[f'{measurement} (Average)'] = df[replicate_cols].mean(axis=1)
-            # Drop the original replicate columns
             df_new.drop(columns=replicate_cols, inplace=True)
+    # print(df)
+    # print(df_new)
+    # exit()
 
     return df_new
 
@@ -123,7 +125,7 @@ def return_filtered_df(df):
     return cols, numeric_cols, numeric_df, numeric_cols_without_nan
 
 def serve_layout(client):
-    default_campaign = 'CBA'    
+    default_campaign = 'BBC'    
 
     df = query(default_campaign, client)
 
@@ -232,16 +234,11 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                 color_column_name, size_column_name):    
 
     try:
-        print(campaign)
+        # print(campaign)
         df = query(campaign, client)
-
-        # print(df)
-        print(df.columns)
 
         if average:
             df = average_replicate_columns(df)
-
-        print(df)
 
         cols, numeric_cols, numeric_df, numeric_cols_without_nan = return_filtered_df(df)
         
