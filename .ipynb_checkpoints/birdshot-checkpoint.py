@@ -93,30 +93,7 @@ def query(campaign, client, raw=False):
 
     return df
 
-def average_replicate_columns(df):
-
-    measurements_to_average = [
-        'Elastic Modulus', 'Elongation', 'Maximum ∂2σ/∂ε2',
-        'UTS/YS Ratio', 'Ultimate Tensile Strength', 'Yield Strength'
-    ]
-
-    df_new = df.copy()
-
-    for measurement in measurements_to_average:
-        # Find columns matching this measurement with .b/.c/.d suffix
-        pattern = re.compile(rf'^{re.escape(measurement)}\.[a-zA-Z]$')
-        replicate_cols = [col for col in df.columns if pattern.match(col)]
-
-        if replicate_cols:
-            df_new[f'{measurement} (Average)'] = df[replicate_cols].mean(axis=1)
-            df_new.drop(columns=replicate_cols, inplace=True)
-    # print(df)
-    # print(df_new)
-    # exit()
-
-    return df_new
-
-# ========= Plot Server =========
+# ========= 02_Campaign_Analysis: Plotting Functions =========
 
 def return_filtered_df(df):
     numeric_df = df.select_dtypes(include=[int, float])
@@ -231,6 +208,7 @@ def serve_layout(client):
      Input('color-column', 'value'),
      Input('size-column', 'value')]
 )
+
 def update_graph(campaign, xaxis_column_name, yaxis_column_name,
                 color_column_name, size_column_name):    
 
@@ -294,7 +272,6 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
     except Exception as e:
         return go.Figure(), 'N/A', 'N/A', f'An error occurred: {str(e)}', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
 
-# ========= 02: Main Launch Function =========
 def show_plot(external_client):
     global client 
     global average
@@ -321,6 +298,26 @@ def show_plot(external_client):
     return app
 
 # ========= 04_Campaign_Status =========
+
+def average_replicate_columns(df):
+
+    measurements_to_average = [
+        'Elastic Modulus', 'Elongation', 'Maximum ∂2σ/∂ε2',
+        'UTS/YS Ratio', 'Ultimate Tensile Strength', 'Yield Strength'
+    ]
+
+    df_new = df.copy()
+
+    for measurement in measurements_to_average:
+        # Find columns matching this measurement with .b/.c/.d suffix
+        pattern = re.compile(rf'^{re.escape(measurement)}\.[a-zA-Z]$')
+        replicate_cols = [col for col in df.columns if pattern.match(col)]
+
+        if replicate_cols:
+            df_new[f'{measurement} (Average)'] = df[replicate_cols].mean(axis=1)
+            df_new.drop(columns=replicate_cols, inplace=True)
+
+    return df_new
 
 def summarize_presence_by_sample(df: pd.DataFrame, campaign: str, group_prefixes=None) -> pd.DataFrame:
     if group_prefixes is None:
