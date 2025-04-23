@@ -10,6 +10,7 @@ import logging
 import plotly.graph_objects as go
 import re
 import json
+from collections import defaultdict
 
 query_terms = ["AAA", "AAB", "AAC", "AAD", "AAE", "BAA", "BBA", "BBB", "BBC", "CBA"]
 
@@ -293,7 +294,7 @@ def update_graph(campaign, xaxis_column_name, yaxis_column_name,
     except Exception as e:
         return go.Figure(), 'N/A', 'N/A', f'An error occurred: {str(e)}', numeric_cols, numeric_cols, cols, numeric_cols_without_nan
 
-# ========= Main Launch Function =========
+# ========= 02: Main Launch Function =========
 def show_plot(external_client):
     global client 
     global average
@@ -318,3 +319,60 @@ def show_plot(external_client):
                 raise
 
     return app
+
+# ========= 04_Campaign_Status =========
+
+def summarize_presence_by_sample(df: pd.DataFrame, campaign: str, group_prefixes=None) -> pd.DataFrame:
+    if group_prefixes is None:
+        group_prefixes = [
+            'Elastic Modulus', 'Elongation', 'Maximum ∂2σ/∂ε2',
+            'UTS/YS Ratio', 'Ultimate Tensile Strength', 'Yield Strength'
+        ]
+
+    grouped_columns = defaultdict(list)
+    single_columns = []
+
+    for col in df.columns:
+        for prefix in group_prefixes:
+            pattern = re.compile(rf'^{re.escape(prefix)}\.([a-zA-Z])$')
+            match = pattern.match(col)
+            if match:
+                suffix = match.group(1)
+                grouped_columns[prefix].append((col, suffix))
+                break
+        else:
+            single_columns.append(col)
+
+    summary_rows = []
+
+    for idx, row in df.iterrows():
+        sample_id = row.name if df.index.name else idx
+        entry = {"Sample": sample_id}
+
+        # Grouped columns: summarize which subsamples exist
+        for prefix, cols in grouped_columns.items():
+            present_suffixes = [suffix for col, suffix in cols if pd.notna(row[col])]
+            entry[prefix] = ", ".join(sorted(present_suffixes)) if present_suffixes else "None"
+
+        # Non-grouped columns
+        for col in single_columns:
+            entry[col] = "Yes" if pd.notna(row[col]) else "No"
+
+        summary_rows.append(entry)
+
+    # Add summary row per campaign
+    summary = {"Sample": campaign}
+    total_rows = df.shape[0]
+
+    for prefix, cols in grouped_columns.items():
+        total_possible = total_rows * len(cols)
+        total_present = sum(pd.notna(df[col]).sum() for col, _ in cols)
+        summary[prefix] = f"{total_present}/{total_possible}"
+
+    for col in single_columns:
+        total_present = pd.notna(df[col]).sum()
+        summary[col] = f"{total_present}/{total_rows}"
+
+    summary_rows.append(summary)
+
+    return pd.DataFrame(summary_rows)
