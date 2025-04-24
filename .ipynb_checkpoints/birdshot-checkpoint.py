@@ -28,7 +28,7 @@ def total_molar_mass(composition):
 
 # ========= Query Function =========
 
-def query(campaign, client, raw=False, average_subsample_metrics=False):
+def query(campaign, client, raw=False, take_metric_average=False):
     raw_data = client.get(
         "entry", parameters={"query": f"^{campaign}.._VAM-.", "limit": 1000}
     )
@@ -87,6 +87,9 @@ def query(campaign, client, raw=False, average_subsample_metrics=False):
 
     # Create DataFrame from the data
     df = pd.DataFrame.from_dict(data, orient='index')
+    
+    if take_metric_average:
+        df = average_replicate_columns(df)
 
     # Check that all required columns are present in the DataFrame
     missing_columns = [col for col in types if col not in df.columns]
@@ -96,9 +99,6 @@ def query(campaign, client, raw=False, average_subsample_metrics=False):
         return df
     else:
         df = df.astype(types)
-
-    if average_subsample_metrics:
-        df = average_replicate_columns(df)
 
     return df
 
@@ -408,6 +408,7 @@ def build_timeline(client, filter_by_location):
     # Replace this with your actual sample ID list
     all_samples = client.get("sample") 
     sample_ids = [sample["_id"] for sample in all_samples]
+    sample_ids = [sample_ids[11]]
    
 
     # 1. Fetch and structure data
