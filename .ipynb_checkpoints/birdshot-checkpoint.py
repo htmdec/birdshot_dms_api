@@ -72,6 +72,9 @@ def query(campaign, client, raw=False):
                 data[sample_id]["XRD.Lattice Parameters"] = phase["a"]
             except Exception:
                 continue
+        elif "SPT" in entry["sampleId"]:
+            print(entry)
+            exit()
     
     types = {
         'UTS/YS Ratio.a': float,
