@@ -4,7 +4,9 @@ girder-client
 dash-bootstrap-components
 plotly
 dash
-typing_extensions
+typing_extensions==4.13.2
 openmsimodel
 ydata-profiling==4.5
 folium
+geopy
+pygraphviz
