@@ -10,3 +10,4 @@ ydata-profiling==4.5
 folium
 geopy
 pygraphviz
+jupyter-server-proxy

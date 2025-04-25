@@ -288,6 +288,7 @@ def show_plot(external_client):
     app = Dash(
         __name__,
         external_stylesheets=[dbc.themes.BOOTSTRAP, dbc.icons.FONT_AWESOME],
+        requests_pathname_prefix='/proxy/8050/'
     )
     app.layout = serve_layout(client)
 
@@ -295,7 +296,7 @@ def show_plot(external_client):
     port = 8050
     while True:
         try:
-            app.run(debug=False, host="localhost", port=port)
+            app.run(debug=False, jupyter_mode='jupyterlab', host='0.0.0.0', jupyter_server_url=f"https://{os.environ['TMP_URL']}/")
             break
         except OSError as e:
             if "already in use" in str(e):
